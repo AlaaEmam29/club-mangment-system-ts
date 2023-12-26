@@ -1,6 +1,7 @@
 import { authWithGoogle } from '@/services/authApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const useGoogleAuth = () => {
   const queryClient = useQueryClient();
@@ -13,7 +14,7 @@ const useGoogleAuth = () => {
       queryClient.setQueryData(['user'], data);
       navigate('/update-user', { replace: true });
     },
-    onError: (err: Error) => err.message,
+    onError: (err: Error) => toast.error(err.message),
   });
   return { isAuthLoading, authGoogle };
 };

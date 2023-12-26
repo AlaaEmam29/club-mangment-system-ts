@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Suspense, lazy } from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+
 const AppLayout = lazy(() => import('./components/app/AppLayout'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
@@ -40,6 +42,27 @@ function App() {
       <Suspense fallback={<div>Loading...</div>}>
         <RouterProvider router={router} />
       </Suspense>
+      <Toaster
+                position="bottom-center"
+                reverseOrder={false}
+                gutter={12}
+                containerStyle={{ margin: '1rem' }}
+                toastOptions={{
+                    success: {
+                        duration: 3000,
+                    },
+                    error: {
+                        duration: 5000,
+                    },
+                    style: {
+                        fontSize: '1.6rem',
+                        maxWidth: 'fit-content',
+                        padding: '1.6rem 2.4rem',
+                        backgroundColor: '#fff',
+                        color: '#000',
+                    },
+                }}
+            />
     </QueryClientProvider>
   );
 }

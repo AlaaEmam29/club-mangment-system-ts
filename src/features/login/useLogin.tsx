@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { login } from '@/services/authApi';
+import toast from 'react-hot-toast';
 
 export function useLogin() {
   const queryClient = useQueryClient();
@@ -18,7 +19,7 @@ export function useLogin() {
       );
       navigate('/update-user', { replace: true });
     },
-    onError: (err) => err.message,
+    onError: (err) => toast.error(err.message),
   });
 
   return { isLoginLoading, userLogin };

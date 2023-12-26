@@ -1,6 +1,7 @@
 import { register as registerApi } from '@/services/authApi';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export function useRegister() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ export function useRegister() {
     onSuccess: () => {
       navigate('/login', { replace: true });
     },
-    onError: (err) => err.message,
+    onError: (err) => toast.error(err.message),
   });
 
   return { isRegisterLoading, registerUser };
