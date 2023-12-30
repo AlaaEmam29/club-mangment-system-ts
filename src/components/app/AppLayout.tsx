@@ -3,22 +3,9 @@ import Footer from './Footer';
 import { Box, Container, Grid, GridItem } from '@chakra-ui/react';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import supabase from '@/services/supabase';
-import { useEffect } from 'react';
 
 export default function AppLayout() {
-  const navigate = useNavigate();
-  useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
-      console.log(event, session);
-      if (event === 'SIGNED_OUT' || session == undefined) {
-        navigate('/login', { replace: true });
-      }
-      if (event === 'SIGNED_IN') {
-        navigate('/', { replace: true });
-      }
-    });
-  }, []);
+
 
   return (
     <Grid templateColumns="25rem auto">
@@ -38,7 +25,7 @@ export default function AppLayout() {
       >
         <Header />
         <Box overflow="auto">
-          <Container centerContent p="4" maxW="container.md" bg="blue.600">
+          <Container centerContent p="4" maxW="container.md" >
             <Outlet />
           </Container>
         </Box>

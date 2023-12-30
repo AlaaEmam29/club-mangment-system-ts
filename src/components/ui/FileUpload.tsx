@@ -1,8 +1,6 @@
 import { ReactNode, useRef } from 'react';
-import {
-  InputGroup,
-} from '@chakra-ui/react';
-import {  UseFormRegisterReturn } from 'react-hook-form';
+import { InputGroup } from '@chakra-ui/react';
+import { UseFormRegisterReturn } from 'react-hook-form';
 
 type FileUploadProps = {
   register: UseFormRegisterReturn;
@@ -19,7 +17,6 @@ const FileUpload = (props: FileUploadProps) => {
   };
 
   const handleClick = () => inputRef.current?.click();
-
   return (
     <InputGroup onClick={handleClick}>
       <input

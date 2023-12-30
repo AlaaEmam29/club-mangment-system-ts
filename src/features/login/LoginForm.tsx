@@ -13,15 +13,13 @@ import {
   Heading,
   HStack,
   Input,
-  Link,
   Stack,
-  Text,
-  VStack,
+  Text
 } from '@chakra-ui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useLogin } from './useLogin';
 
 const signInSchema = z.object({

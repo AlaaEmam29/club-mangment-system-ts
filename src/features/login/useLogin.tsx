@@ -12,7 +12,7 @@ export function useLogin() {
     onSuccess: (data) => {
       console.log(data, 'data from register');
       const { user, session } = data;
-      queryClient.setQueryData(['user', user?.id || 'user_id'], user);
+      queryClient.setQueryData(['user'], user);
       queryClient.setQueryData(
         ['session', session?.access_token || 'access_token'],
         session

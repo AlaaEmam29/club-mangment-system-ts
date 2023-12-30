@@ -18,8 +18,13 @@ export default function Navbar() {
   const { user } = useUser();
   const { isLogout, userLogout } = useLogout();
   const user_metadata = user ? user.user_metadata : {};
-  const { full_name = '', avatar_url = '' } = user_metadata;
+  const { full_name, avatar_url } = user_metadata || {
+    full_name: '',
+    avatar_url: '',
+  };
   const email = user ? user.email : '';
+
+  console.log('user', user);
 
   return (
     <Flex width="inherit" as="nav" justify="flex-end">
@@ -34,7 +39,11 @@ export default function Navbar() {
         >
           <Wrap>
             <WrapItem>
-              <Avatar size={'lg'} name={full_name} src={avatar_url} />
+              <Avatar 
+              width='4rem'
+              height='4rem'
+              objectFit='cover'
+              name={full_name} src={avatar_url} />
             </WrapItem>
           </Wrap>
         </MenuButton>
@@ -42,8 +51,9 @@ export default function Navbar() {
           <MenuItem>
             <Flex alignItems="center">
               <Avatar
-                width={'2.5rem'}
-                height={'2.5rem'}
+                width={'3rem'}
+                height={'3rem'}
+                objectFit='cover'
                 name={full_name}
                 src={avatar_url}
               />
@@ -65,7 +75,7 @@ export default function Navbar() {
           <MenuItem
             mt="1rem"
             as="button"
-            onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+            onClick={() =>
               userLogout()
             }
             disabled={isLogout}

@@ -3,6 +3,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Suspense, lazy } from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import ProtectedRoute from './components/app/ProtectedRoute';
+import MainLoader from './components/app/MainLoader';
 
 const AppLayout = lazy(() => import('./components/app/AppLayout'));
 const Login = lazy(() => import('./pages/Login'));
@@ -25,44 +27,61 @@ const queryClient = new QueryClient({
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <AppLayout />,
+    element: (
+        <ProtectedRoute>
+          <AppLayout />
+        </ProtectedRoute>
+    ),
     children: [],
   },
-  { path: '/login', element: <Login /> },
-  { path: '/register', element: <Register /> },
+  {
+    path: '/login',
+    element: (
+        <Login />
+    ),
+  },
+  {
+    path: '/register',
+    element: (
+        <Register />
+    ),
+  },
   { path: '/forget-password', element: <ForgetPassword /> },
   { path: '/update-password', element: <UpdatePassword /> },
-  { path: '/update-user', element: <UpdateUser /> },
+  {
+    path: '/update-user',
+    element: <UpdateUser />,
+  },
   { path: '*', element: <div>Not Found</div> },
 ]);
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<MainLoader/>}>
         <RouterProvider router={router} />
       </Suspense>
       <Toaster
-                position="bottom-center"
-                reverseOrder={false}
-                gutter={12}
-                containerStyle={{ margin: '1rem' }}
-                toastOptions={{
-                    success: {
-                        duration: 3000,
-                    },
-                    error: {
-                        duration: 5000,
-                    },
-                    style: {
-                        fontSize: '1.6rem',
-                        maxWidth: 'fit-content',
-                        padding: '1.6rem 2.4rem',
-                        backgroundColor: '#fff',
-                        color: '#000',
-                    },
-                }}
-            />
+        position="bottom-center"
+        reverseOrder={false}
+        gutter={12}
+        containerStyle={{ margin: '1rem' }}
+        toastOptions={{
+          success: {
+            duration: 3000,
+          },
+          error: {
+            duration: 5000,
+          },
+          style: {
+            fontSize: '1.6rem',
+            maxWidth: 'fit-content',
+            padding: '1.6rem 2.4rem',
+            backgroundColor: '#fff',
+            color: '#000',
+          },
+        }}
+      />
     </QueryClientProvider>
   );
 }

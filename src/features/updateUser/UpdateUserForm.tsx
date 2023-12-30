@@ -1,4 +1,8 @@
 import {
+  Box,
+  Button,
+  ButtonGroup,
+  Flex,
   Step,
   StepDescription,
   StepIcon,
@@ -6,66 +10,22 @@ import {
   StepNumber,
   StepSeparator,
   StepStatus,
-  StepTitle,
-  Container,
   Stepper,
   useSteps,
-  Box,
-  Flex,
-  ButtonGroup,
-  Button,
 } from '@chakra-ui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import StepOne from './StepOne';
 import StepTwo from './StepTwo';
-import { zodResolver } from '@hookform/resolvers/zod';
-import validator from 'validator';
-import * as z from 'zod';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-const stepOnValues = {
-  full_name: '',
-  phone: '',
-  date_of_birth: '',
-  gender: '',
-};
-const stepTwoValues = {
-  street: '',
-  city: '',
-  card_number: '',
-  expiry_date: '',
-  cvv: '',
-  card_holder_name: '',
-};
-
-const updateUserSchema = z.object({
-  full_name: z
-    .string()
-    .nonempty({ message: 'Full name is required.' })
-    .min(2, { message: 'Full name must be at least 2 characters long.' }),
-  phone: z
-    .string()
-    .nonempty({ message: 'Phone number is required.' })
-    .refine(validator.isMobilePhone),
-  date_of_birth: z.string().nonempty({ message: 'Date of birth is required.' }),
-
-  gender: z.string().nonempty({ message: 'Gender is required.' }),
-  street: z.string().nonempty({ message: 'Street is required.' }),
-  city: z.string().nonempty({ message: 'City is required.' }),
-  card_number: z
-    .string()
-    .min(1, { message: 'Card number is required.' })
-    .min(20, { message: 'Card number must be at least 20 characters long.' }),
-  expiry_date: z.string().nonempty({ message: 'Expiry date is required.' }),
-  cvv: z
-    .string()
-    .nonempty({ message: 'CVV is required.' })
-    .min(3, { message: 'CVV must be at least 3 characters long.' })
-    .max(3, { message: 'CVV can be at most 3 characters long.' }),
-  card_holder_name: z
-    .string()
-    .min(1, { message: 'Card holder name is required.' }),
-});
-type UpdateUserFormValues = z.infer<typeof updateUserSchema>;
+import {
+  UpdateUserFormValues,
+  stepOneValues,
+  stepTwoValues,
+  updateUserSchema,
+} from './schema';
+import useUpdateUser from './useUpdateUser';
 const steps = [
   {
     title: 'Step 1',
@@ -76,47 +36,64 @@ const steps = [
     description: 'Update Address and Payment Information',
   },
 ];
+const renderSteps = ({
+  step , form  , isUpdateUserLoading , setIsValidSecondStep , setIsValidFistStep
+} :{
+  step : string , form : any , isUpdateUserLoading : boolean,
+  setIsValidSecondStep: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsValidFistStep: React.Dispatch<React.SetStateAction<boolean>>}) => {
+  switch (step) {
+    case 'Step 1':
+      return <StepOne form={form}
+      setIsValidFistStep={setIsValidFistStep}
+      />;
+    case 'Step 2':
+      return (
+        <StepTwo 
+        setIsValidSecondStep={setIsValidSecondStep}
+        form={form} isLoadingOrDisabled={isUpdateUserLoading} />
+      );
+
+    default:
+      return <StepOne form={form} 
+      setIsValidFistStep={setIsValidFistStep}
+      />;
+  }
+};
 function UpdateUserForm() {
   const { activeStep, setActiveStep } = useSteps({
     index: 0,
     count: steps.length,
   });
+  const [isValidFistStep , setIsValidFistStep] = useState<boolean>(false)
+  const [isValidSecondStep , setIsValidSecondStep] = useState<boolean>(false)
   const form = useForm<UpdateUserFormValues>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
-      ...stepOnValues,
+      ...stepOneValues,
       ...stepTwoValues,
     },
     mode: 'onBlur',
   });
-  const isValidFistStep = Object.keys(stepOnValues).every(
-    (key) => form.getValues(key as keyof typeof stepOnValues) !== ''
-  );
-  const isValidSecondStep = Object.keys(stepTwoValues).every(
-    (key) => form.getValues(key as keyof typeof stepOnValues) !== ''
-  );
 
-  const renderSteps = (step: string) => {
-    switch (step) {
-      case 'Step 1':
-        return <StepOne form={form} />;
-      case 'Step 2':
-        return <StepTwo form={form} />;
-      default:
-        return <StepOne form={form} />;
+  const { updateUser, isUpdateUserLoading } = useUpdateUser();
+
+  const onSubmit = async () => {
+    const data = form.getValues();
+    try {
+      const result = await updateUser(data);
+      console.log(result);
+      form.reset();
+    } catch (error) {
+      console.log(error);
     }
   };
-  const onSubmit = () => {
-    const data = form.getValues();
-    console.log(data);
-  };
-  console.log(form.formState.errors, 'form.formState.errors');
+  const step = steps[activeStep].title
+
   return (
     <Flex
       width="90%"
       mx="auto"
-      height="100vh"
-      // justify='center'
       align="center"
       flexDirection="column"
       as="main"
@@ -132,12 +109,8 @@ function UpdateUserForm() {
             >
               <StepStatus
                 complete={<StepIcon />}
-                incomplete={
-                  <StepNumber fontSize={{ base: '1.2rem', md: '1.8rem' }} />
-                }
-                active={
-                  <StepNumber fontSize={{ base: '1.2rem', md: '1.8rem' }} />
-                }
+                incomplete={<StepNumber />}
+                active={<StepNumber />}
               />
             </StepIndicator>
 
@@ -149,7 +122,7 @@ function UpdateUserForm() {
           </Step>
         ))}
       </Stepper>
-      {renderSteps(steps[activeStep].title)}
+      {renderSteps({step, form , isUpdateUserLoading , setIsValidSecondStep , setIsValidFistStep})}
       <ButtonGroup mt="2rem">
         <Button
           colorScheme="blue"
@@ -161,7 +134,7 @@ function UpdateUserForm() {
               setActiveStep(activeStep - 1);
             }
           }}
-          isDisabled={activeStep === 0}
+          isDisabled={activeStep === 0 || isUpdateUserLoading}
         >
           Previous
         </Button>
@@ -173,7 +146,12 @@ function UpdateUserForm() {
             fontSize={{ base: '1.2rem', md: '1.4rem' }}
             colorScheme="blue"
             onClick={onSubmit}
-            isDisabled={activeStep !== steps.length - 1 || !isValidSecondStep}
+            isLoading={isUpdateUserLoading}
+            isDisabled={
+              activeStep !== steps.length - 1 ||
+              !isValidSecondStep ||
+              isUpdateUserLoading
+            }
           >
             Finish
           </Button>
